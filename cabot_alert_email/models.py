@@ -1,7 +1,10 @@
+import time
 from os import environ as env
+from pyvirtualdisplay import Display
+from selenium import webdriver
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
 from django.template import Context, Template
 
 from cabot.cabotapp.alert import AlertPlugin
@@ -22,7 +25,7 @@ class EmailAlert(AlertPlugin):
     name = "Email"
     author = "Jonathan Balls"
 
-    def send_alert(self, service, users, duty_officers):
+    def send_alert(self, service, users, duty_officers, url=None):
         emails = [u.email for u in users if u.email] + [u.email for u in duty_officers if u.email]
         if not emails:
             return
@@ -36,23 +39,30 @@ class EmailAlert(AlertPlugin):
                 service.overall_status, service.name)
         else:
             subject = 'Service back to normal: %s' % (service.name,)
+
         t = Template(email_template)
-        send_mail(
-            subject=subject,
-            message=t.render(c),
-            from_email='Cabot <%s>' % env.get('CABOT_FROM_EMAIL'),
-            recipient_list=emails,
+        email = EmailMessage(
+            subject,
+            t.render(c),
+            'Cabot <{}>'.format(env.get('CABOT_FROM_EMAIL')),
+            emails
         )
+        if url is not None:
+            screenshot_file = self._get_graph_screenshot(url, service.name)
+            email.attach_file(screenshot_file)
+
+        email.send()
 
     # apt-get install xvfb firefox
     # pip install selenium pyvirtualdisplay
     # install geckodriver (or chromedriver or something)
-        from pyvirtualdisplay import Display
-        from selenium import webdriver
+    def _get_graph_screenshot(self, url, name):
         display = Display(visible=0, size=(800, 600))
         display.start()
         browser = webdriver.Firefox()
-        browser.get('url')
-        browser.save_screenshot('name.png')
+        browser.get(url)
+        file = '{}-{}.png'.format(str(time.now()), name)
+        browser.save_screenshot(file)
         browser.quit()
         # display.stop() ? or something
+        return './{}'.format(file)

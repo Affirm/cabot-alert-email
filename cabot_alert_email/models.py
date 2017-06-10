@@ -43,3 +43,16 @@ class EmailAlert(AlertPlugin):
             from_email='Cabot <%s>' % env.get('CABOT_FROM_EMAIL'),
             recipient_list=emails,
         )
+
+    # apt-get install xvfb firefox
+    # pip install selenium pyvirtualdisplay
+    # install geckodriver (or chromedriver or something)
+        from pyvirtualdisplay import Display
+        from selenium import webdriver
+        display = Display(visible=0, size=(800, 600))
+        display.start()
+        browser = webdriver.Firefox()
+        browser.get('url')
+        browser.save_screenshot('name.png')
+        browser.quit()
+        # display.stop() ? or something

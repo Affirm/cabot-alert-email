@@ -1,3 +1,5 @@
+from django.contrib.auth.models import User
+
 from cabot.cabotapp.tests.tests_basic import LocalTestCase
 from mock import Mock, patch
 
@@ -47,4 +49,19 @@ class TestEmailAlerts(LocalTestCase):
         self.service.save()
         self.service.alert()
         fake_send_mail.assert_called_with(message=u'Service Service http://localhost/service/1/ alerting with status: failing.\n\nCHECKS FAILING:\n\nPassing checks:\n  PASSING - Graphite Check - Type: Metric check - Importance: Error\n  PASSING - Http Check - Type: HTTP check - Importance: Critical\n  PASSING - Jenkins Check - Type: Jenkins check - Importance: Error\n\n\n', subject='failing status for service: Service', recipient_list=[u'test@userprofile.co.uk'], from_email='Cabot <cabot@example.com>')
-        
+
+    @patch('cabot_alert_email.models.send_mail')
+    def test_email_duty_officers(self, fake_send_mail):
+        duty_officer = User.objects.create_user('test')
+        duty_officer_profile = UserProfile(user=duty_officer, email='test@test.test')
+        duty_officer_profile.save()
+
+        models.EmailAlert.send_alert(self.service, [self.user_profile], [duty_officer_profile])
+        fake_send_mail.assert_called_with(message=u'Service Service http://localhost/service/1/ alerting with status: '
+                                                  u'failing.\n\nCHECKS FAILING:\n\nPassing checks:\n  PASSING - '
+                                                  u'Graphite Check - Type: Metric check - Importance: Error\n  PASSING '
+                                                  u'- Http Check - Type: HTTP check - Importance: Critical\n  PASSING '
+                                                  u'- Jenkins Check - Type: Jenkins check - Importance: Error\n\n\n',
+                                          subject='failing status for service: Service',
+                                          recipient_list=[u'test@userprofile.co.uk', u'test@test.test'],
+                                          from_email='Cabot <cabot@example.com>')

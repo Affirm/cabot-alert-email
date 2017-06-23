@@ -26,7 +26,7 @@ class EmailAlert(AlertPlugin):
     author = "Jonathan Balls"
 
     def send_alert(self, service, users, duty_officers):
-        emails = [u.email for u in users + duty_officers if u.email]
+        emails = [u.email for u in users if u.email] + [u.email for u in duty_officers if u.email]
         if not emails:
             return
         c = Context({

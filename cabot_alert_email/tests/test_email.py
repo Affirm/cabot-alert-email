@@ -5,7 +5,7 @@ from mock import Mock, patch
 
 from cabot.cabotapp.models import UserProfile, Service
 from cabot_alert_email import models
-from cabot.cabotapp.alert import update_alert_plugins
+from cabot.cabotapp.alert import update_alert_plugins, send_alert
 
 
 class TestEmailAlerts(LocalTestCase):
@@ -56,7 +56,7 @@ class TestEmailAlerts(LocalTestCase):
         duty_officer_profile = UserProfile(user=duty_officer, email='test@test.test')
         duty_officer_profile.save()
 
-        models.EmailAlert.send_alert(self.service, [self.user_profile], [duty_officer_profile])
+        send_alert(self.service, [duty_officer_profile], [])
         fake_send_mail.assert_called_with(message=u'Service Service http://localhost/service/1/ alerting with status: '
                                                   u'failing.\n\nCHECKS FAILING:\n\nPassing checks:\n  PASSING - '
                                                   u'Graphite Check - Type: Metric check - Importance: Error\n  PASSING '

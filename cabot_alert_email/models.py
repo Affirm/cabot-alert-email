@@ -27,11 +27,11 @@ class EmailAlert(AlertPlugin):
     name = "Email"
     author = "Jonathan Balls"
 
-    def _get_grafana_panel_image(self, panel_url, grafana_url):
-        url_partitions = panel_url.partition(grafana_url)
-        rendered_image_url = urljoin(urljoin(url_partitions[1], 'render'), url_partitions[2])
+    def _get_grafana_panel_image(self, panel_url, grafana_instance):
+        panel_url = panel_url.replace(grafana_instance.url, '')
+        rendered_image_url = urljoin('render/', panel_url)
 
-        image_request = requests.get(rendered_image_url)
+        image_request = grafana_instance.get_request(rendered_image_url)
         try:
             image_request.raise_for_status()
             return image_request.content
@@ -69,7 +69,7 @@ class EmailAlert(AlertPlugin):
             if check.grafana_panel is not None:
                 message.attach('grafana.png',
                                self._get_grafana_panel_image(check.grafana_panel.panel_url,
-                                                             check.grafana_panel.grafana_instance.url),
+                                                             check.grafana_panel.grafana_instance),
                                'image/png')
 
         message.send()

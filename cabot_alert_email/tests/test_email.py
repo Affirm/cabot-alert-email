@@ -5,7 +5,7 @@ from mock import Mock, patch
 
 from cabot.cabotapp.models import UserProfile, Service
 from cabot.metricsapp.models import ElasticsearchStatusCheck, GrafanaPanel, GrafanaInstance, ElasticsearchSource
-from cabot_alert_email import models, EmailAlert
+from cabot_alert_email import models
 from cabot.cabotapp.alert import update_alert_plugins
 
 

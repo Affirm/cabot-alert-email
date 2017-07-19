@@ -66,11 +66,10 @@ class TestEmailAlerts(LocalTestCase):
     @patch('cabot_alert_email.models.EmailMessage')
     def test_email_duty_officers(self, fake_send_mail):
         duty_officer = User.objects.create_user('test')
-        duty_officer_profile = UserProfile(user=duty_officer)
-        duty_officer_profile.user.email = 'test@test.test'
-        duty_officer_profile.save()
+        duty_officer.email = 'test@test.test'
+        duty_officer.save()
 
-        self.email_alert.send_alert(self.service, [duty_officer_profile], [])
+        self.email_alert.send_alert(self.service, [duty_officer], [])
         fake_send_mail.assert_called_with(body=u'Service Service http://localhost/service/{}/ alerting with status: '
                                                u'failing.\n\nCHECKS FAILING:\n\n\nPassing checks:\n  PASSING - '
                                                u'Graphite Check - Type: Metric check - Importance: Error\n  PASSING '
@@ -118,6 +117,7 @@ class TestEmailAlerts(LocalTestCase):
         self.service.overall_status = Service.CALCULATED_FAILING_STATUS
         self.service.old_overall_status = Service.PASSING_STATUS
         self.service.save()
+        self.assertEqual(self.service.status_checks.all(), 'elaine')
 
         self.service.alert()
         fake_send_mail.assert_called_with(

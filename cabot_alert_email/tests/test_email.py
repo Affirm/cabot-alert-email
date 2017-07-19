@@ -45,7 +45,6 @@ class TestEmailAlerts(LocalTestCase):
                                           subject='Service back to normal: Service',
                                           to=[u'test@userprofile.co.uk'],
                                           from_email='Cabot <cabot@example.com>')
-        fake_send_mail.send.assert_called_with()
 
     @patch('cabot_alert_email.models.EmailMessage')
     def test_failure_alert(self, fake_send_mail):
@@ -63,7 +62,6 @@ class TestEmailAlerts(LocalTestCase):
                                           subject='failing status for service: Service',
                                           to=[u'test@userprofile.co.uk'],
                                           from_email='Cabot <cabot@example.com>')
-        fake_send_mail.send.assert_called_with()
 
     @patch('cabot_alert_email.models.EmailMessage')
     def test_email_duty_officers(self, fake_send_mail):
@@ -81,7 +79,6 @@ class TestEmailAlerts(LocalTestCase):
                                           subject='failing status for service: Service',
                                           to=[u'test@userprofile.co.uk', u'test@test.test'],
                                           from_email='Cabot <cabot@example.com>')
-        fake_send_mail.send.assert_called_with()
 
     @patch('cabot_alert_email.models.EmailMessage')
     def test_grafana_attachment(self, fake_send_mail):
@@ -119,11 +116,12 @@ class TestEmailAlerts(LocalTestCase):
         self.service.overall_status = Service.CALCULATED_FAILING_STATUS
         self.service.old_overall_status = Service.PASSING_STATUS
         self.service.save()
+        self.assertEqual(self.service.status_checks, 'elaine')
 
         self.service.alert()
         fake_send_mail.assert_called_with(
             body=u'Service Service http://localhost/service/{}/ alerting with status: failing.\n\n'
-                 u'CHECKS FAILING:\n\n  FAILING - checkycheck - Type:  - Importance: Warning\n  '
+                 u'CHECKS FAILING:\n\n\n  '
                  u'Passing checks:\n  PASSING - Graphite Check - Type: Metric check - Importance: Error\n  '
                  u'PASSING - Http Check - Type: HTTP check - Importance: Critical\n  '
                  u'PASSING - Jenkins Check - Type: Jenkins check - Importance: Error\n\n\n'

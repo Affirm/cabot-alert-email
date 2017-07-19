@@ -1,11 +1,10 @@
 from os import environ as env
 
 from django.conf import settings
-from django.template import Context, Template
 from django.core.mail import EmailMultiAlternatives
+from django.template import Context, Template
 
 from cabot.cabotapp.alert import AlertPlugin
-
 
 email_txt_template = """Service {{ service.name }} {{ scheme }}://{{ host }}{% url 'service' pk=service.id %} {% if service.overall_status != service.PASSING_STATUS %}alerting with status: {{ service.overall_status }}{% else %}is back to normal{% endif %}.
 {% if service.overall_status != service.PASSING_STATUS %}
@@ -74,18 +73,34 @@ class EmailAlert(AlertPlugin):
     author = "Jonathan Balls"
 
     def send_alert(self, service, users, duty_officers):
+        """
+        Send an email to the specified users with the service status and (possibly) Grafana panel images/links.
+        """
         emails = [u.email for u in users if u.email] + \
                  [u.email for u in duty_officers if u.email]
+
         if not emails:
             return
+
         c = Context({
             'service': service,
             'host': settings.WWW_HTTP_HOST,
             'scheme': settings.WWW_SCHEME
         })
+
+        images = {}
         if service.overall_status != service.PASSING_STATUS:
             subject = '%s status for service: %s' % (
                 service.overall_status, service.name)
+
+            failing_metrics_checks = service.all_failing_checks()
+
+            # Get the panel urls and name: image mapping for the failing metrics checks
+            for check in failing_metrics_checks:
+                image = check.get_status_image()
+                if image is not None:
+                    images[check.name] = image
+
         else:
             subject = 'Service back to normal: %s' % (service.name,)
 
@@ -98,5 +113,7 @@ class EmailAlert(AlertPlugin):
         msg.mixed_subtype = 'related'
 
         # Insert images here
+        for name, image in images.iteritems():
+            msg.attach('{}.png'.format(name), image, 'image/png')
 
         msg.send()

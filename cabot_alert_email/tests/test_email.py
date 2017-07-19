@@ -40,7 +40,11 @@ class TestEmailAlerts(LocalTestCase):
         self.service.old_overall_status = Service.ERROR_STATUS
         self.service.save()
         self.service.alert()
-        fake_send_mail.assert_called_with(body=u'Service Service http://localhost/service/1/ is back to normal.\n\n', subject='Service back to normal: Service', to=[u'test@userprofile.co.uk'], from_email='Cabot <cabot@example.com>')
+        fake_send_mail.assert_called_with(body=u'Service Service http://localhost/service/{}/'
+                                               u' is back to normal.\n\n'.format(self.service.id),
+                                          subject='Service back to normal: Service',
+                                          to=[u'test@userprofile.co.uk'],
+                                          from_email='Cabot <cabot@example.com>')
         fake_send_mail.send.assert_called_with()
 
     @patch('cabot_alert_email.models.EmailMessage')
@@ -50,7 +54,15 @@ class TestEmailAlerts(LocalTestCase):
         self.service.old_overall_status = Service.PASSING_STATUS
         self.service.save()
         self.service.alert()
-        fake_send_mail.assert_called_with(body=u'Service Service http://localhost/service/1/ alerting with status: failing.\n\nCHECKS FAILING:\n\nPassing checks:\n  PASSING - Graphite Check - Type: Metric check - Importance: Error\n  PASSING - Http Check - Type: HTTP check - Importance: Critical\n  PASSING - Jenkins Check - Type: Jenkins check - Importance: Error\n\n\n', subject='failing status for service: Service', to=[u'test@userprofile.co.uk'], from_email='Cabot <cabot@example.com>')
+        fake_send_mail.assert_called_with(body=u'Service Service http://localhost/service/{}/ alerting with status: '
+                                               u'failing.\n\nCHECKS FAILING:\n\nPassing checks:\n  '
+                                               u'PASSING - Graphite Check - Type: Metric check - Importance: Error\n  '
+                                               u'PASSING - Http Check - Type: HTTP check - Importance: Critical\n  '
+                                               u'PASSING - Jenkins Check - Type: Jenkins check '
+                                               u'- Importance: Error\n\n\n'.format(self.service.id),
+                                          subject='failing status for service: Service',
+                                          to=[u'test@userprofile.co.uk'],
+                                          from_email='Cabot <cabot@example.com>')
         fake_send_mail.send.assert_called_with()
 
     @patch('cabot_alert_email.models.EmailMessage')
@@ -60,11 +72,12 @@ class TestEmailAlerts(LocalTestCase):
         duty_officer_profile.save()
 
         send_alert(self.service, [duty_officer_profile], [])
-        fake_send_mail.assert_called_with(body=u'Service Service http://localhost/service/1/ alerting with status: '
+        fake_send_mail.assert_called_with(body=u'Service Service http://localhost/service/{}/ alerting with status: '
                                                u'failing.\n\nCHECKS FAILING:\n\nPassing checks:\n  PASSING - '
                                                u'Graphite Check - Type: Metric check - Importance: Error\n  PASSING '
                                                u'- Http Check - Type: HTTP check - Importance: Critical\n  PASSING '
-                                               u'- Jenkins Check - Type: Jenkins check - Importance: Error\n\n\n',
+                                               u'- Jenkins Check - Type: Jenkins check - Importance: Error\n\n\n'
+                                               .format(self.service.id),
                                           subject='failing status for service: Service',
                                           to=[u'test@userprofile.co.uk', u'test@test.test'],
                                           from_email='Cabot <cabot@example.com>')
@@ -78,7 +91,6 @@ class TestEmailAlerts(LocalTestCase):
             api_key='271828'
         )
         panel = GrafanaPanel.objects.create(
-            name='panel',
             grafana_instance=instance,
             dashboard_uri='db/hi-im-panel',
             panel_id=1000000,
@@ -109,13 +121,14 @@ class TestEmailAlerts(LocalTestCase):
 
         self.service.alert()
         fake_send_mail.assert_called_with(
-            body=u'Service Service http://localhost/service/1/ alerting with status: failing.\n\n'
+            body=u'Service Service http://localhost/service/{}/ alerting with status: failing.\n\n'
                  u'CHECKS FAILING:\n\n  FAILING - checkycheck - Type:  - Importance: Warning\n  '
                  u'Passing checks:\n  PASSING - Graphite Check - Type: Metric check - Importance: Error\n  '
                  u'PASSING - Http Check - Type: HTTP check - Importance: Critical\n  '
                  u'PASSING - Jenkins Check - Type: Jenkins check - Importance: Error\n\n\n'
                  u'Grafana links for the failing checks: \n'
-                 u'https://reallygreaturl.yep/render/dashboard-solo/db/hi-im-panel&var-params=All',
+                 u'https://reallygreaturl.yep/render/dashboard-solo/db/hi-im-panel&var-params=All'
+                .format(self.service.id),
             subject='failing status for service: Service', to=[u'test@userprofile.co.uk'],
             from_email='Cabot <cabot@example.com>')
         fake_send_mail.send.assert_called_with()

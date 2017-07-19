@@ -4,7 +4,7 @@ from cabot.cabotapp.tests.tests_basic import LocalTestCase
 from mock import Mock, patch
 
 from cabot.cabotapp.models import UserProfile, Service
-from cabot.metricsapp.models import ElasticsearchStatusCheck, GrafanaPanel, GrafanaInstance
+from cabot.metricsapp.models import ElasticsearchStatusCheck, GrafanaPanel, GrafanaInstance, ElasticsearchSource
 from cabot_alert_email import models
 from cabot.cabotapp.alert import update_alert_plugins, send_alert
 
@@ -30,7 +30,7 @@ class TestEmailAlerts(LocalTestCase):
 
     def test_model_attributes(self):
         self.assertEqual(self.service.users_to_notify.all().count(), 1)
-        self.assertEqual(self.service.users_to_notify.get(pk=1).username, self.user.username)
+        self.assertEqual(self.service.users_to_notify.get(email='test@userprofile.co.uk').username, self.user.username)
 
         self.assertEqual(self.service.alerts.all().count(), 1)
 
@@ -55,7 +55,7 @@ class TestEmailAlerts(LocalTestCase):
         self.service.save()
         self.service.alert()
         fake_send_mail.assert_called_with(body=u'Service Service http://localhost/service/{}/ alerting with status: '
-                                               u'failing.\n\nCHECKS FAILING:\n\nPassing checks:\n  '
+                                               u'failing.\n\nCHECKS FAILING:\n\n\nPassing checks:\n  '
                                                u'PASSING - Graphite Check - Type: Metric check - Importance: Error\n  '
                                                u'PASSING - Http Check - Type: HTTP check - Importance: Critical\n  '
                                                u'PASSING - Jenkins Check - Type: Jenkins check '
@@ -73,7 +73,7 @@ class TestEmailAlerts(LocalTestCase):
 
         send_alert(self.service, [duty_officer_profile], [])
         fake_send_mail.assert_called_with(body=u'Service Service http://localhost/service/{}/ alerting with status: '
-                                               u'failing.\n\nCHECKS FAILING:\n\nPassing checks:\n  PASSING - '
+                                               u'failing.\n\nCHECKS FAILING:\n\n\nPassing checks:\n  PASSING - '
                                                u'Graphite Check - Type: Metric check - Importance: Error\n  PASSING '
                                                u'- Http Check - Type: HTTP check - Importance: Critical\n  PASSING '
                                                u'- Jenkins Check - Type: Jenkins check - Importance: Error\n\n\n'
@@ -98,10 +98,11 @@ class TestEmailAlerts(LocalTestCase):
             selected_series='a',
             panel_url='https://reallygreaturl.yep/dashboard-solo/db/hi-im-panel&var-params=$__all'
         )
+        source = ElasticsearchSource.objects.create(name='hi', urls='')
         check = ElasticsearchStatusCheck.objects.create(
             name='checkycheck',
             created_by=self.user,
-            source=self.es_source,
+            source=source,
             check_type='>=',
             warning_value=3.5,
             high_alert_importance='CRITICAL',

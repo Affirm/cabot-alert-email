@@ -65,6 +65,10 @@ class TestEmailAlerts(LocalTestCase):
 
     @patch('cabot_alert_email.models.EmailMessage')
     def test_email_duty_officers(self, fake_send_mail):
+        self.service.overall_status = Service.CALCULATED_FAILING_STATUS
+        self.service.old_overall_status = Service.PASSING_STATUS
+        self.service.save()
+
         duty_officer = User.objects.create_user('test')
         duty_officer.email = 'test@test.test'
         duty_officer.save()
@@ -117,7 +121,7 @@ class TestEmailAlerts(LocalTestCase):
         self.service.overall_status = Service.CALCULATED_FAILING_STATUS
         self.service.old_overall_status = Service.PASSING_STATUS
         self.service.save()
-        self.assertEqual(self.service.status_checks.all(), 'elaine')
+        self.assertEqual(self.service.status_checks.exclude(metricsstatuscheckbase__isnull=True), 'elaine')
 
         self.service.alert()
         fake_send_mail.assert_called_with(

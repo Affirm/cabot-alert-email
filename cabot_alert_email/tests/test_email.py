@@ -66,7 +66,8 @@ class TestEmailAlerts(LocalTestCase):
     @patch('cabot_alert_email.models.EmailMessage')
     def test_email_duty_officers(self, fake_send_mail):
         duty_officer = User.objects.create_user('test')
-        duty_officer_profile = UserProfile(user=duty_officer, email='test@test.test')
+        duty_officer_profile = UserProfile(user=duty_officer)
+        duty_officer_profile.user.email = 'test@test.test'
         duty_officer_profile.save()
 
         send_alert(self.service, [duty_officer_profile], [])

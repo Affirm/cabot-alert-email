@@ -59,7 +59,7 @@ class EmailAlert(AlertPlugin):
                 service.overall_status, service.name)
 
             failing_metrics_checks = service.status_checks \
-                .filter(calculated_status=service.CALCULATED_FAILING_STATUS) \
+                .exclude(calculated_status=service.PASSING_STATUS) \
                 .exclude(metricsstatuscheckbase__isnull=True) \
                 .filter(active=True)
 

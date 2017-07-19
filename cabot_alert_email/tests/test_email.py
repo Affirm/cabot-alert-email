@@ -116,13 +116,13 @@ class TestEmailAlerts(LocalTestCase):
             active=True,
             grafana_panel=panel
         )
-        check.calculated_status = Service.CALCULATED_FAILING_STATUS
+        check.calculated_status = self.service.CALCULATED_FAILING_STATUS
         self.service.status_checks.add(check)
         self.service.overall_status = Service.CALCULATED_FAILING_STATUS
         self.service.old_overall_status = Service.PASSING_STATUS
         self.service.save()
         self.assertEqual(self.service.status_checks.exclude(metricsstatuscheckbase__isnull=True)
-                 .filter(calculated_status=Service.CALCULATED_FAILING_STATUS), 'elaine')
+                         .exclude(calculated_status=self.service.PASSING_STATUS), 'elaine')
 
         self.service.alert()
         fake_send_mail.assert_called_with(

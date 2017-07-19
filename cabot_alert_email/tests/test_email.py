@@ -117,7 +117,7 @@ class TestEmailAlerts(LocalTestCase):
             grafana_panel=panel
         )
         check.calculated_status = self.service.WARNING_STATUS
-        self.service.status_checks.add(check)
+        #self.service.status_checks.add(check)
         self.service.overall_status = Service.CALCULATED_FAILING_STATUS
         self.service.old_overall_status = Service.PASSING_STATUS
         self.service.save()
@@ -134,6 +134,3 @@ class TestEmailAlerts(LocalTestCase):
                 .format(self.service.id),
             subject='failing status for service: Service', to=[u'test@userprofile.co.uk'],
             from_email='Cabot <cabot@example.com>')
-        fake_send_mail.send.assert_called_with()
-
-

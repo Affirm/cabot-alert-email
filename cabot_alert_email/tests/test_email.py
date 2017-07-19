@@ -70,7 +70,7 @@ class TestEmailAlerts(LocalTestCase):
         duty_officer_profile.user.email = 'test@test.test'
         duty_officer_profile.save()
 
-        EmailAlert.send_alert(self.service, [duty_officer_profile], [])
+        self.email_alert.send_alert(self.service, [duty_officer_profile], [])
         fake_send_mail.assert_called_with(body=u'Service Service http://localhost/service/{}/ alerting with status: '
                                                u'failing.\n\nCHECKS FAILING:\n\n\nPassing checks:\n  PASSING - '
                                                u'Graphite Check - Type: Metric check - Importance: Error\n  PASSING '

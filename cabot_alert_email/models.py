@@ -85,7 +85,7 @@ class EmailAlert(AlertPlugin):
             'service': service,
             'host': settings.WWW_HTTP_HOST,
             'scheme': settings.WWW_SCHEME,
-            'panel_urls': ''
+            'panel_urls': '\n'.join(panel_urls)
         })
 
         t = Template(email_template)
@@ -97,8 +97,8 @@ class EmailAlert(AlertPlugin):
             to=emails,
         )
 
-        for name, image in images.iteritems():
-            logger.critical('attaching something {} {}'.format(name, image))
-            message.attach('{}.png'.format(name), image, 'image/png')
+        # for name, image in images.iteritems():
+        #     logger.critical('attaching something {} {}'.format(name, image))
+        #     message.attach('{}.png'.format(name), image, 'image/png')
 
         message.send()

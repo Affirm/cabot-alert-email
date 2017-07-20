@@ -135,7 +135,7 @@ class TestEmailAlerts(LocalTestCase):
         fake_send_mail.assert_called_with(
             body=u'Service Service http://localhost/service/{}/ alerting with status: failing.\n\n'
                  u'CHECKS FAILING:\n'
-                 u'Grafana links for the failing checks: \n'
+                 u'Grafana links for the failing checks:\n'
                  u'https://reallygreaturl.yep/render/dashboard-solo/db/hi-im-panel&var-params=All\n\n'
                  u'Passing checks:\n  PASSING - Graphite Check - Type: Metric check - Importance: Error\n  '
                  u'PASSING - Http Check - Type: HTTP check - Importance: Critical\n  '

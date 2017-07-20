@@ -85,7 +85,10 @@ class TestEmailAlerts(LocalTestCase):
                                           from_email='Cabot <cabot@example.com>')
 
     @patch('cabot_alert_email.models.EmailMessage')
-    def test_grafana_attachment(self, fake_send_mail):
+    @patch('requests.get')
+    def test_grafana_attachment(self, fake_send_mail, fake_requests):
+        fake_requests.return_value = '12345'
+
         instance = GrafanaInstance.objects.create(
             name='test',
             url='http://reallygreaturl.yep',

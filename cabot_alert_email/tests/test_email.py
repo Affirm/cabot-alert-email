@@ -132,11 +132,11 @@ class TestEmailAlerts(LocalTestCase):
         fake_send_mail.assert_called_with(
             body=u'Service Service http://localhost/service/{}/ alerting with status: failing.\n\n'
                  u'CHECKS FAILING:\n\n\n  '
+                 u'Grafana links for the failing checks: \n'
+                 u'https://reallygreaturl.yep/render/dashboard-solo/db/hi-im-panel&var-params=All'
                  u'Passing checks:\n  PASSING - Graphite Check - Type: Metric check - Importance: Error\n  '
                  u'PASSING - Http Check - Type: HTTP check - Importance: Critical\n  '
                  u'PASSING - Jenkins Check - Type: Jenkins check - Importance: Error\n\n\n'
-                 u'Grafana links for the failing checks: \n'
-                 u'https://reallygreaturl.yep/render/dashboard-solo/db/hi-im-panel&var-params=All'
                 .format(self.service.id),
             subject='failing status for service: Service', to=[u'test@userprofile.co.uk'],
             from_email='Cabot <cabot@example.com>')

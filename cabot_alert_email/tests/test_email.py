@@ -142,7 +142,7 @@ class TestEmailAlerts(LocalTestCase):
                  u'CHECKS FAILING:\n'
                  u'Grafana links for the failing checks:\n'
                  u'https://reallygreaturl.yep/dashboard-solo/db/hi-im-panel&amp;var-params=$__all.\n\n'
-                 u'Passing checks:\n  PASSING - checkycheck - Type:  - Importance: Error\n  '
+                 u'Passing checks:\n  PASSING - checkycheck - Type: Elasticsearch check - Importance: Error\n  '
                  u'PASSING - Graphite Check - Type: Metric check - Importance: Error\n  '
                  u'PASSING - Http Check - Type: HTTP check - Importance: Critical\n  '
                  u'PASSING - Jenkins Check - Type: Jenkins check - Importance: Error\n\n\n'

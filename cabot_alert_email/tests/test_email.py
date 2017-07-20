@@ -85,7 +85,10 @@ class TestEmailAlerts(LocalTestCase):
                                           from_email='Cabot <cabot@example.com>')
 
     @patch('cabot_alert_email.models.EmailMessage')
-    def test_grafana_attachment(self, fake_send_mail):
+    @patch('cabot.metricsapp.models.grafana.requests.get')
+    def test_grafana_attachment(self, fake_requests, fake_send_mail):
+        fake_requests.return_value = '12345'
+
         instance = GrafanaInstance.objects.create(
             name='test',
             url='http://reallygreaturl.yep',
@@ -131,12 +134,13 @@ class TestEmailAlerts(LocalTestCase):
         self.service.alert()
         fake_send_mail.assert_called_with(
             body=u'Service Service http://localhost/service/{}/ alerting with status: failing.\n\n'
-                 u'CHECKS FAILING:\n\n\n  '
+                 u'CHECKS FAILING:\n'
                  u'Grafana links for the failing checks: \n'
-                 u'https://reallygreaturl.yep/render/dashboard-solo/db/hi-im-panel&var-params=All'
+                 u'https://reallygreaturl.yep/render/dashboard-solo/db/hi-im-panel&var-params=All\n\n'
                  u'Passing checks:\n  PASSING - Graphite Check - Type: Metric check - Importance: Error\n  '
                  u'PASSING - Http Check - Type: HTTP check - Importance: Critical\n  '
                  u'PASSING - Jenkins Check - Type: Jenkins check - Importance: Error\n\n\n'
+
                 .format(self.service.id),
             subject='failing status for service: Service', to=[u'test@userprofile.co.uk'],
             from_email='Cabot <cabot@example.com>')

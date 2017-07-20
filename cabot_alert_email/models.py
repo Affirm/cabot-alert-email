@@ -37,8 +37,8 @@ class EmailAlert(AlertPlugin):
         # Unfortunately this works for the normal image but not render
         rendered_image_url = rendered_image_url.replace('$__all', 'All')
 
-        image_request = grafana_instance.get_request(rendered_image_url)
         try:
+            image_request = grafana_instance.get_request(rendered_image_url)
             image_request.raise_for_status()
             return image_request.content
         except requests.exceptions.HTTPError:

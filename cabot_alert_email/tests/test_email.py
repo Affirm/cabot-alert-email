@@ -91,7 +91,7 @@ class TestEmailAlerts(LocalTestCase):
     def test_grafana_attachment(self, fake_request, fake_attach, fake_send_mail):
         fake_request.return_value = Response()
         fake_request.return_value.status_code = 200
-        fake_request.return_value.content = '12345'
+        fake_request.return_value._content = '12345'
 
         instance = GrafanaInstance.objects.create(
             name='test',

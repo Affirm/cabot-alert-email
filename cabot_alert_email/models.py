@@ -96,6 +96,8 @@ class EmailAlert(AlertPlugin):
             from_email='Cabot <%s>' % env.get('CABOT_FROM_EMAIL'),
             to=emails,
         )
+        logger.critical(str(type(message)))
+        logger.critical(message)
 
         # for name, image in images.iteritems():
         #     logger.critical('attaching something {} {}'.format(name, image))

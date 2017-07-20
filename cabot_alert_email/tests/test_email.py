@@ -125,6 +125,9 @@ class TestEmailAlerts(LocalTestCase):
         self.service.overall_status = Service.CALCULATED_FAILING_STATUS
         self.service.save()
 
+        self.assertEqual(self.service.overall_status, Service.PASSING_STATUS)
+        self.assertEqual(self.service.old_overall_status, Service.CALCULATED_FAILING_STATUS)
+
         self.service.alert()
         fake_send_mail.assert_called_with(
             body=u'Service Service http://localhost/service/{}/ alerting with status: failing.\n\n'

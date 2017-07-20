@@ -41,7 +41,8 @@ class EmailAlert(AlertPlugin):
             image_request = grafana_instance.get_request(rendered_image_url)
             image_request.raise_for_status()
             return image_request.content
-        except requests.exceptions.HTTPError:
+        except Exception:
+            # No matter the exception we still want to to send the email
             return None
 
     def send_alert(self, service, users, duty_officers):

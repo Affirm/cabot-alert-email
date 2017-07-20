@@ -8,6 +8,11 @@ from urlparse import urljoin
 from cabot.cabotapp.alert import AlertPlugin
 
 import requests
+import logging
+
+
+logger = logging.getLogger(__name__)
+
 
 email_template = """Service {{ service.name }} {{ scheme }}://{{ host }}{% url 'service' pk=service.id %} {% if service.overall_status != service.PASSING_STATUS %}alerting with status: {{ service.overall_status }}{% else %}is back to normal{% endif %}.
 {% if service.overall_status != service.PASSING_STATUS %}
@@ -20,6 +25,7 @@ Passing checks:{% for check in service.all_passing_checks %}
 {% endif %}
 {% endif %}
 """
+
 
 class EmailAlert(AlertPlugin):
     name = "Email"
@@ -41,8 +47,8 @@ class EmailAlert(AlertPlugin):
             image_request = grafana_instance.get_request(rendered_image_url)
             image_request.raise_for_status()
             return image_request.content
-        except Exception:
-            # No matter the exception we still want to to send the email
+        except requests.exceptions.RequestException as e:
+            logger.error('Failed to get Grafana panel image for email alert')
             return None
 
     def send_alert(self, service, users, duty_officers):
@@ -92,6 +98,7 @@ class EmailAlert(AlertPlugin):
         )
 
         for name, image in images.iteritems():
+            logger.critical('attaching something {} {}'.format(name, image))
             message.attach('{}.png'.format(name), image, 'image/png')
 
         message.send()

@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 
 from cabot.cabotapp.tests.tests_basic import LocalTestCase
 from mock import Mock, patch
+from requests.models import Response
 
 from cabot.cabotapp.models import UserProfile, Service
 from cabot.metricsapp.models import ElasticsearchStatusCheck, GrafanaPanel, GrafanaInstance, ElasticsearchSource
@@ -88,7 +89,9 @@ class TestEmailAlerts(LocalTestCase):
     @patch('cabot_alert_email.models.EmailMessage.attach')
     @patch('cabot.metricsapp.models.grafana.GrafanaInstance.get_request')
     def test_grafana_attachment(self, fake_request, fake_attach, fake_send_mail):
-        fake_request.return_value = '12345'
+        fake_request.return_value = Response()
+        fake_request.return_value.status_code = 200
+        fake_request.return_value.content = '12345'
 
         instance = GrafanaInstance.objects.create(
             name='test',

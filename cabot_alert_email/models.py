@@ -18,7 +18,6 @@ email_template = """Service {{ service.name }} {{ scheme }}://{{ host }}{% url '
 {% if service.overall_status != service.PASSING_STATUS %}
 CHECKS FAILING:{% for check in service.all_failing_checks %}
   FAILING - {{ check.name }} - Type: {{ check.check_category }} - Importance: {{ check.get_importance_display }}{% endfor %}
-{% if panel_urls %}Grafana links for the failing checks:{{ panel_urls }}.{% endif %}
 {% if service.all_passing_checks %}
 Passing checks:{% for check in service.all_passing_checks %}
   PASSING - {{ check.name }} - Type: {{ check.check_category }} - Importance: {{ check.get_importance_display }}{% endfor %}
@@ -30,6 +29,8 @@ Passing checks:{% for check in service.all_passing_checks %}
 class EmailAlert(AlertPlugin):
     name = "Email"
     author = "Jonathan Balls"
+    test = "{% if panel_urls %}Grafana links for the failing checks:{{ panel_urls }}.{% endif %}"
+
 
     def _get_grafana_panel_image(self, panel_url, grafana_instance):
         """

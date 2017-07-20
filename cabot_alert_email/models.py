@@ -45,7 +45,9 @@ class EmailAlert(AlertPlugin):
 
         try:
             image_request = grafana_instance.get_request(rendered_image_url)
+            logger.critical('image request: {}', type(image_request))
             image_request.raise_for_status()
+            logger.critical('raise for status passed. content: {}'.format(image_request.content))
             return image_request.content
         except requests.exceptions.RequestException as e:
             logger.error('Failed to get Grafana panel image for email alert')

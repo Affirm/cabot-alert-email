@@ -86,12 +86,13 @@ class TestEmailAlerts(LocalTestCase):
                                           from_email='Cabot <cabot@example.com>')
 
     @patch('cabot_alert_email.models.EmailMessage')
-    @patch('cabot_alert_email.models.EmailMessage.attach')
     @patch('cabot.metricsapp.models.grafana.GrafanaInstance.get_request')
-    def test_grafana_attachment(self, fake_request, fake_attach, fake_send_mail):
+    def test_grafana_attachment(self, fake_request, fake_send_mail):
         fake_request.return_value = Response()
         fake_request.return_value.status_code = 200
         fake_request.return_value._content = '12345'
+        fake_message = Mock()
+        fake_send_mail.return_value = fake_message
 
         instance = GrafanaInstance.objects.create(
             name='test',
@@ -141,7 +142,7 @@ class TestEmailAlerts(LocalTestCase):
                  u'CHECKS FAILING:\n'
                  u'Grafana links for the failing checks:\n'
                  u'https://reallygreaturl.yep/dashboard-solo/db/hi-im-panel&amp;var-params=$__all.\n\n'
-                 u'Passing checks:\n  PASSING - checkycheck - Type:  - Importance: Error\n  '
+                 u'Passing checks:\n  PASSING - checkycheck - Type: Elasticsearch check - Importance: Error\n  '
                  u'PASSING - Graphite Check - Type: Metric check - Importance: Error\n  '
                  u'PASSING - Http Check - Type: HTTP check - Importance: Critical\n  '
                  u'PASSING - Jenkins Check - Type: Jenkins check - Importance: Error\n\n\n'
@@ -150,4 +151,4 @@ class TestEmailAlerts(LocalTestCase):
             from_email='Cabot <cabot@example.com>')
 
         fake_request.assert_called_with('render/dashboard-solo/db/hi-im-panel&var-params=All')
-        fake_attach.assert_called_with('checkycheck.png', '12345', 'image/png')
+        fake_message.attach.assert_called_with('checkycheck.png', '12345', 'image/png')

@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 
 email_template = """Service {{ service.name }} {{ scheme }}://{{ host }}{% url 'service' pk=service.id %} {% if service.overall_status != service.PASSING_STATUS %}alerting with status: {{ service.overall_status }}{% else %}is back to normal{% endif %}.
 {% if service.overall_status != service.PASSING_STATUS %}
+{% if panel_urls %}Grafana links for the failing checks:{{ panel_urls }}.{% endif %}
 CHECKS FAILING:{% for check in service.all_failing_checks %}
   FAILING - {{ check.name }} - Type: {{ check.check_category }} - Importance: {{ check.get_importance_display }}{% endfor %}
-{% if panel_urls %}Grafana links for the failing checks:{{ panel_urls }}.{% endif %}
 {% if service.all_passing_checks %}
 Passing checks:{% for check in service.all_passing_checks %}
   PASSING - {{ check.name }} - Type: {{ check.check_category }} - Importance: {{ check.get_importance_display }}{% endfor %}

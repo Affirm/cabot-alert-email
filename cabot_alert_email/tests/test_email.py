@@ -95,7 +95,7 @@ class TestEmailAlerts(LocalTestCase):
 
         instance = GrafanaInstance.objects.create(
             name='test',
-            url='http://reallygreaturl.yep',
+            url='https://reallygreaturl.yep',
             api_key='271828'
         )
         panel = GrafanaPanel.objects.create(

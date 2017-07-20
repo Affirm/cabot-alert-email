@@ -116,10 +116,13 @@ class TestEmailAlerts(LocalTestCase):
             active=True,
             grafana_panel=panel
         )
-        self.service.overall_status = Service.PASSING_STATUS
-        self.service.save()
+
         check.calculated_status = Service.CALCULATED_FAILING_STATUS
         self.service.status_checks.add(check)
+        self.service.save()
+
+        self.service.old_overall_status = Service.PASSING_STATUS
+        self.service.overall_status = Service.CALCULATED_FAILING_STATUS
         self.service.save()
 
         self.service.alert()

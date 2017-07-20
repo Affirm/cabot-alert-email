@@ -85,7 +85,7 @@ class EmailAlert(AlertPlugin):
             'service': service,
             'host': settings.WWW_HTTP_HOST,
             'scheme': settings.WWW_SCHEME,
-            'panel_urls': '\n'.join(panel_urls)
+            'panel_urls': ''
         })
 
         t = Template(email_template)
@@ -95,7 +95,7 @@ class EmailAlert(AlertPlugin):
             body=t.render(c),
             from_email='Cabot <%s>' % env.get('CABOT_FROM_EMAIL'),
             to=emails,
-        )ee
+        )
 
         # for name, image in images.iteritems():
         #     logger.critical('attaching something {} {}'.format(name, image))

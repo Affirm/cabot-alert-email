@@ -37,7 +37,7 @@ Service <a href="{{ scheme }}://{{ host }}{% url 'service' pk=service.id %}"><b>
     </tr>
   {% for check in service.all_failing_checks %}
     <tr>
-      <td><b>{{ check.name }}</b></td>
+      <td><a href='{{ scheme }}://{{ host }}{% url 'check' pk=check.id %}'>{{ check.name }}</a></td>
       <td>{{ check.check_category }}</td>
       <td>{{ check.get_importance_display }}</td>
     </tr>
@@ -57,7 +57,7 @@ Service <a href="{{ scheme }}://{{ host }}{% url 'service' pk=service.id %}"><b>
     </tr>
     {% for check in service.all_passing_checks %}
     <tr>
-      <td><b>{{ check.name }}</b></td>
+      <td><a href='{{ scheme }}://{{ host }}{% url 'check' pk=check.id %}'>{{ check.name }}</a></td>
       <td>{{ check.check_category }}</td>
       <td>{{ check.get_importance_display }}</td>
     </tr>

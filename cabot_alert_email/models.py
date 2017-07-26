@@ -23,7 +23,7 @@ Service <a href="{{ scheme }}://{{ host }}{% url 'service' pk=service.id %}"><b>
 
 {% if service.overall_status != service.PASSING_STATUS %}
 <b><u>Failing Checks</u><b><br/>
-  <table>
+  <table cellpadding='1' cellspacing='1' border='0'>
     <tr>
       <th>Service Name</th>
       <th>Check Type</th>

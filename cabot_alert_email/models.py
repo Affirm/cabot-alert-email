@@ -21,11 +21,12 @@ Passing checks:{% for check in service.all_passing_checks %}
 email_html_template = """
 Service <a href="{{ scheme }}://{{ host }}{% url 'service' pk=service.id %}"><b>{{ service.name }}</b></a> {% if service.overall_status != service.PASSING_STATUS %}alerting with status: {{ service.overall_status }}{% else %}is back to normal{% endif %}.
 
+<br/>
 {% if service.overall_status != service.PASSING_STATUS %}
-<b><u>Failing Checks</u><b><br/>
-  <table cellpadding='1' cellspacing='1' border='0'>
+<b><u>Failing Checks</u></b><br/>
+  <table cellpadding='1' cellspacing='1' border='0' align='left'>
     <tr>
-      <th>Service Name</th>
+      <th>Check Name</th>
       <th>Check Type</th>
       <th>Importance</th>
     </tr>
@@ -37,12 +38,13 @@ Service <a href="{{ scheme }}://{{ host }}{% url 'service' pk=service.id %}"><b>
     </tr>
   {% endfor %}
   </table>
-  {% if service.all_passing_checks %}
+
 <br/>
-<b><u>Passing Checks</u><b><br/>
-  <table>
+  {% if service.all_passing_checks %}
+<b><u>Passing Checks</u></b><br/>
+  <table cellpadding='1' cellspacing='1' border='0' align='left'>
     <tr>
-      <th>Service Name</th>
+      <th>Check Name</th>
       <th>Check Type</th>
       <th>Importance</th>
     </tr>
@@ -53,6 +55,7 @@ Service <a href="{{ scheme }}://{{ host }}{% url 'service' pk=service.id %}"><b>
       <td>{{ check.get_importance_display }}</td>
     </tr>
     {% endfor %}
+  </table>
   {% endif %}
 {% endif %}
 """

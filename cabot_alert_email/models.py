@@ -9,7 +9,7 @@ from cabot.cabotapp.alert import AlertPlugin
 email_txt_template = """Service {{ service.name }} {{ scheme }}://{{ host }}{% url 'service' pk=service.id %} {% if service.overall_status != service.PASSING_STATUS %}alerting with status: {{ service.overall_status }}{% else %}is back to normal{% endif %}.
 {% if service.overall_status != service.PASSING_STATUS %}
 CHECKS FAILING:{% for check in service.all_failing_checks %}
-  FAILING - {{ check.name }} - Type: {{ check.check_category }} - Importance: {{ check.get_importance_display }}{% endfor %}
+  FAILING - {{ check.name }}{% if check.calculated_status == 'acked' %} (acked){% endif %} - Type: {{ check.check_category }} - Importance: {{ check.get_importance_display }}{% endfor %}
 {% if service.all_passing_checks %}
 Passing checks:{% for check in service.all_passing_checks %}
   PASSING - {{ check.name }} - Type: {{ check.check_category }} - Importance: {{ check.get_importance_display }}{% endfor %}
@@ -36,7 +36,7 @@ Service <a href="{{ scheme }}://{{ host }}{% url 'service' pk=service.id %}"><b>
     </tr>
   {% for check in service.all_failing_checks %}
     <tr>
-      <td><a href='{{ scheme }}://{{ host }}{% url 'check' pk=check.id %}'>{{ check.name }}</a></td>
+      <td><a href='{{ scheme }}://{{ host }}{% url 'check' pk=check.id %}'>{{ check.name }}</a>{% if check.calculated_status == 'acked' %} (acked){% endif %}</td>
       <td>{{ check.check_category }}</td>
       <td>{{ check.get_importance_display }}</td>
     </tr>
@@ -80,6 +80,10 @@ class EmailAlert(AlertPlugin):
                  [u.email for u in duty_officers if u.email]
 
         if not emails:
+            return
+
+        # don't send emails for acked services
+        if service.overall_status == service.ACKED_STATUS:
             return
 
         c = Context({

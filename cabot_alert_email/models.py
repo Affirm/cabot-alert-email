@@ -103,6 +103,7 @@ ollapse;'>
       <th class=3D'dimension'>Check Type</th>
       <th class=3D'dimension'>Importance</th>
       <th class=3D'dimension'>Error</th>
+      <th class=3D'dimension'>Tags</th>
     </tr>
    </thead>
    <tbody>
@@ -111,7 +112,8 @@ ollapse;'>
       <td class=3D'dimension'><a href='{{ scheme }}://{{ host }}{% url 'check' pk=check.id %}'>{{ check.name }}</a>{% if check.calculated_status == 'acked' %} (acked){% endif %}</td>
       <td class=3D'dimension'>{{ check.check_category }}</td>
       <td class=3D'dimension'>{{ check.get_importance_display }}</td>
-      <td class=3D'dimension'>{{ '\n'.join(check.last_result.tags) | default:'' | safe }}</td>
+      <td class=3D'dimension'>{{ check.last_result.error | default:'' | safe }}</td>
+      <td class=3D'dimension'>{{ check.last_result.tags|join('\n') | default:'' | safe }}</td>
     </tr>
   {% endfor %}
    </tbody>

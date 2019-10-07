@@ -113,7 +113,7 @@ ollapse;'>
       <td class=3D'dimension'>{{ check.check_category }}</td>
       <td class=3D'dimension'>{{ check.get_importance_display }}</td>
       <td class=3D'dimension'>{{ check.last_result.error | default:'' | safe }}</td>
-      <td class=3D'dimension'>{{ check.last_result.tags|join('\n') | default:'' | safe }}</td>
+      <td class=3D'dimension'><pre>{{ check.last_result.print_tags | default:'' }}</pre></td>
     </tr>
   {% endfor %}
    </tbody>

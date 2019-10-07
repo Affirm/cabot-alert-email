@@ -10,14 +10,80 @@ email_txt_template = """Service {{ service.name }} {{ scheme }}://{{ host }}{% u
 {% if service.overall_status != service.PASSING_STATUS %}
 CHECKS FAILING:{% for check in service.all_failing_checks %}
   FAILING - {{ check.name }}{% if check.calculated_status == 'acked' %} (acked){% endif %} - Type: {{ check.check_category }} - Importance: {{ check.get_importance_display }}{% endfor %}
-{% if service.all_passing_checks %}
-Passing checks:{% for check in service.all_passing_checks %}
-  PASSING - {{ check.name }} - Type: {{ check.check_category }} - Importance: {{ check.get_importance_display }}{% endfor %}
-{% endif %}
 {% endif %}
 """
 
 email_html_template = """
+<html>
+  <head>
+     <title>Cabot Alert</title>
+
+<style type=3D"text/css">a {
+  color: #0099cc;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+table {
+  border: 1px solid #c0c0c0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: #333;
+  font: 11px "Helvetica Neue", Helvetica Arial, "Lucida Grande", sans-serif=
+;
+  width: 100%;
+}
+
+th {
+  background: #dedede;
+  border: 1px solid #c0c0c0;
+  font-weight: 700;
+  padding: 4px 4px;
+  text-align: left;
+}
+
+th.pivot {
+  background: #e6e6e6;
+  text-align: center;
+}
+
+th.dimension, .dimension a, .pivot a {
+  color: #0099cc;
+}
+
+th.measure, .measure a {
+  color: #f26100;
+}
+
+td {
+  border: none;
+  line-height: 18px;
+  padding: 1px 3px;
+}
+
+tr:nth-child(even) td {
+  background-color: #e6e6e6;
+}
+
+tr:nth-child(even) td + td {
+  border-left: 1px solid #fff;
+}
+
+.index, .right {
+  text-align: right;
+}
+
+.dimension + .measure, .dimension + .pivot {
+  border-left: 2px solid #000;
+}
+
+.single_value {
+  font-size: 2em;
+}</style>
+</head><body><p></p><p>
 <table>
   <tr>
     <td colspan=3>
@@ -28,42 +94,33 @@ Service <a href="{{ scheme }}://{{ host }}{% url 'service' pk=service.id %}"><b>
   <tr><td>
 {% if service.overall_status != service.PASSING_STATUS %}
 <b>Failing Checks</b><br/>
-  <table cellpadding='4' cellspacing='1' border='1' align='left'>
+  <table border=3D'1' cellspacing=3D'=
+0' cellpadding=3D'3' style=3D'border: 1px solid #c0c0c0; border-collapse: c=
+ollapse;'>
+   <thead>
     <tr>
-      <th bgcolor='dedede'>Check Name</th>
-      <th bgcolor='dedede'>Check Type</th>
-      <th bgcolor='dedede'>Importance</th>
+      <th class=3D'dimension'>Check Name</th>
+      <th class=3D'dimension'>Check Type</th>
+      <th class=3D'dimension'>Importance</th>
+      <th class=3D'dimension'>Error</th>
+      <th class=3D'dimension'>Tags</th>
     </tr>
+   </thead>
+   <tbody>
   {% for check in service.all_failing_checks %}
     <tr>
-      <td><a href='{{ scheme }}://{{ host }}{% url 'check' pk=check.id %}'>{{ check.name }}</a>{% if check.calculated_status == 'acked' %} (acked){% endif %}</td>
-      <td>{{ check.check_category }}</td>
-      <td>{{ check.get_importance_display }}</td>
+      <td class=3D'dimension'><a href='{{ scheme }}://{{ host }}{% url 'check' pk=check.id %}'>{{ check.name }}</a>{% if check.calculated_status == 'acked' %} (acked){% endif %}</td>
+      <td class=3D'dimension'>{{ check.check_category }}</td>
+      <td class=3D'dimension'>{{ check.get_importance_display }}</td>
+      <td class=3D'dimension'>{{ check.last_result.error | default:'' | safe }}</td>
+      <td class=3D'dimension'><pre>{{ check.last_result.print_tags | default:'' }}</pre></td>
     </tr>
   {% endfor %}
+   </tbody>
   </table>
   </td></tr>
-  <tr></tr>
-  <tr><td>
-
-  {% if service.all_passing_checks %}
-<b>Passing Checks</b><br/>
-  <table cellpadding='4' cellspacing='1' border='1' align='left'>
-    <tr>
-      <th bgcolor='dedede'>Check Name</th>
-      <th bgcolor='dedede'>Check Type</th>
-      <th bgcolor='dedede'>Importance</th>
-    </tr>
-    {% for check in service.all_passing_checks %}
-    <tr>
-      <td><a href='{{ scheme }}://{{ host }}{% url 'check' pk=check.id %}'>{{ check.name }}</a></td>
-      <td>{{ check.check_category }}</td>
-      <td>{{ check.get_importance_display }}</td>
-    </tr>
-    {% endfor %}
-  </table>
-  </td></tr></table>
-  {% endif %}
+ </tbody>
+</table></body></html>
 {% endif %}
 """
 
